@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from prophet import Prophet
 from .preprocess import preprocess_revenue, preprocess_complete
+from frontend.app import prediction_date
 
 def regressor_model():
 
@@ -22,7 +23,7 @@ def regressor_model():
     horizon = 16
 
     #Splitting the data
-    split_date = "2022-08-01"
+    split_date = prediction_date
     index_split = df[df["ds"]==split_date].index[0]
     df_train = merged_df.iloc[:index_split]
     df_test = merged_df.iloc[index_split:]
