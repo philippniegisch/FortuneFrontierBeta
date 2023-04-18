@@ -17,6 +17,7 @@ def regressor_model():
     weather_forecast["ds"] = pd.to_datetime(weather_forecast["ds"])
     weather_forecast["forecast dt iso"] = pd.to_datetime(weather_forecast["forecast dt iso"])
     merged_df = pd.merge(df,feature_df,how="left")
+    merged_df['cap'] = 1.2 * df['y'].max()
 
     #Setting variables
     horizon = 16
@@ -35,25 +36,23 @@ def regressor_model():
     weather_predict = weather_predict.drop(columns="forecast dt iso")
 
     #Instatiating  the model
-    m = Prophet()
+    m = Prophet(growth = 'logistic', changepoint_prior_scale = 0.1, seasonality_prior_scale = 0.1, seasonality_mode='multiplicative',\
+           yearly_seasonality= 12, weekly_seasonality = True)
 
     #Adding regressors/features
     m.add_regressor("temp")
-    m.add_regressor("humidity")
     m.add_regressor("wind_speed")
     m.add_regressor("wind_deg")
     m.add_regressor("rain")
     m.add_regressor("clouds")
     m.add_regressor("Holiday")
     m.add_regressor("inflation_rate")
-    m.add_regressor("Consumption Climate")
-    m.add_regressor("cov_lock")
-    m.add_regressor("unemp_Berlin_Mitte")
 
     m = m.fit(df_train)
 
     #Creating future dataframe
     future = m.make_future_dataframe(periods=horizon)
+    future['cap'] = 1.2 * merged_df['y'].max()
 
     #Adding feature values to future dataframe
     future = pd.merge(future,feature_df,how="left")
@@ -64,6 +63,10 @@ def regressor_model():
 
     #Predicting
     forecast = m.predict(future)
+    #Clipping low predictions at 200€
+    for col in ['yhat', 'yhat_lower', 'yhat_upper']:
+        forecast[col] = forecast[col].clip(lower=200.0)
+
     seven_day_forecast = forecast.tail(horizon)
     seven_day_forecast_slim = seven_day_forecast[["ds","yhat_lower","yhat","yhat_upper"]]
     prediction_forecast = seven_day_forecast_slim
