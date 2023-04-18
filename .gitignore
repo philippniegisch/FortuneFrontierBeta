@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-=======
 raw_data
->>>>>>> 5cf90468bfa77b50b4a208c5dfd9ec949ea4a219
 raw_data/
 feature_data/
 output_data/
@@ -9,3 +6,4 @@ models/
 api/
 .env
 project/params.py
+*.egg-info
