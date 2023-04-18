@@ -1,17 +1,56 @@
 #IMPORTS
 import pandas as pd
 import numpy as np
-import datetime
+from google.cloud import storage
+import google
+import pandas as pd
+import os
+import io
 
 def preprocess_revenue():
+    #call GCS bucket
+    bucket_name = os.environ.get("BUCKET_NAME")
+    client = storage.Client()
+    bucket = client.get_bucket(bucket_name)
+
     #import raw revenue data
-    df_2016 = pd.read_csv("raw_data/orders2016.csv", sep=";")
+    blob2016 = bucket.blob("orders2016.csv")
+    csv_data2016 = blob2016.download_as_string()
+    df_2016 = pd.read_csv(io.BytesIO(csv_data2016), sep=";")
+
+    blob2017 = bucket.blob("orders2017.csv")
+    csv_data2017 = blob2017.download_as_string()
+    df_2017 = pd.read_csv(io.BytesIO(csv_data2017), sep=";")
+
+    blob2018 = bucket.blob("orders2018.csv")
+    csv_data2018 = blob2018.download_as_string()
+    df_2018 = pd.read_csv(io.BytesIO(csv_data2018), sep=";")
+
+    blob2019 = bucket.blob("orders2019.csv")
+    csv_data2019 = blob2019.download_as_string()
+    df_2019 = pd.read_csv(io.BytesIO(csv_data2019), sep=";")
+
+    blob2020 = bucket.blob("orders2020.csv")
+    csv_data2020 = blob2020.download_as_string()
+    df_2020 = pd.read_csv(io.BytesIO(csv_data2020), sep=";")
+
+    blob2021 = bucket.blob("orders2021.csv")
+    csv_data2021 = blob2021.download_as_string()
+    df_2021 = pd.read_csv(io.BytesIO(csv_data2021), sep=";")
+
+    blob2022 = bucket.blob("orders2022.csv")
+    csv_data2022 = blob2022.download_as_string()
+    df_2022 = pd.read_csv(io.BytesIO(csv_data2022), sep=";")
+
+    #previous structure
+    '''
     df_2017 = pd.read_csv("raw_data/orders2017.csv", sep=";")
     df_2018 = pd.read_csv("raw_data/orders2018.csv", sep=";")
     df_2019 = pd.read_csv("raw_data/orders2019.csv", sep=";")
     df_2020 = pd.read_csv("raw_data/orders2020.csv", sep=";")
     df_2021 = pd.read_csv("raw_data/orders2021.csv", sep=";")
     df_2022 = pd.read_csv("raw_data/orders2022.csv", sep=";")
+    '''
 
     df_list = [df_2016, df_2017, df_2018, df_2019, df_2020, df_2021, df_2022]
 
@@ -40,9 +79,42 @@ def preprocess_revenue():
     return df
 
 def preprocess_complete():
-
+    #call GCS bucket
+    bucket_name = os.environ.get("BUCKET_NAME")
+    client = storage.Client()
+    bucket = client.get_bucket(bucket_name)
     #df data
     #import raw revenue data
+    blob2016 = bucket.blob("orders2016.csv")
+    csv_data2016 = blob2016.download_as_string()
+    df_2016 = pd.read_csv(io.BytesIO(csv_data2016), sep=";")
+
+    blob2017 = bucket.blob("orders2017.csv")
+    csv_data2017 = blob2017.download_as_string()
+    df_2017 = pd.read_csv(io.BytesIO(csv_data2017), sep=";")
+
+    blob2018 = bucket.blob("orders2018.csv")
+    csv_data2018 = blob2018.download_as_string()
+    df_2018 = pd.read_csv(io.BytesIO(csv_data2018), sep=";")
+
+    blob2019 = bucket.blob("orders2019.csv")
+    csv_data2019 = blob2019.download_as_string()
+    df_2019 = pd.read_csv(io.BytesIO(csv_data2019), sep=";")
+
+    blob2020 = bucket.blob("orders2020.csv")
+    csv_data2020 = blob2020.download_as_string()
+    df_2020 = pd.read_csv(io.BytesIO(csv_data2020), sep=";")
+
+    blob2021 = bucket.blob("orders2021.csv")
+    csv_data2021 = blob2021.download_as_string()
+    df_2021 = pd.read_csv(io.BytesIO(csv_data2021), sep=";")
+
+    blob2022 = bucket.blob("orders2022.csv")
+    csv_data2022 = blob2022.download_as_string()
+    df_2022 = pd.read_csv(io.BytesIO(csv_data2022), sep=";")
+
+    #previous structure
+    '''
     df_2016 = pd.read_csv("../../raw_data/orders2016.csv", sep=";")
     df_2017 = pd.read_csv("../../raw_data/orders2017.csv", sep=";")
     df_2018 = pd.read_csv("../../raw_data/orders2018.csv", sep=";")
@@ -50,6 +122,7 @@ def preprocess_complete():
     df_2020 = pd.read_csv("../../raw_data/orders2020.csv", sep=";")
     df_2021 = pd.read_csv("../../raw_data/orders2021.csv", sep=";")
     df_2022 = pd.read_csv("../../raw_data/orders2022.csv", sep=";")
+    '''
     df_list = [df_2016, df_2017, df_2018, df_2019, df_2020, df_2021, df_2022]
     #Dropping unnecessary columns, grouping by "date", summing "item_price" to get daily revenues
     for i, df in enumerate(df_list):
@@ -70,7 +143,10 @@ def preprocess_complete():
     duplicates = df['ds'].duplicated()
 
     #weather data
-    weather_df = pd.read_csv("../../feature_data/weather.csv")
+    blob_weather = bucket.blob("feature_data/weather.csv")
+    csv_data_weather = blob_weather.download_as_string()
+    weather_df = pd.read_csv(io.BytesIO(csv_data_weather))
+
     #drop some columns
     weather_df = weather_df.drop(columns=["dt","timezone","city_name","lat","lon","sea_level","grnd_level","weather_icon","rain_3h","snow_3h"])
     #rename
@@ -103,7 +179,9 @@ def preprocess_complete():
     merged_df.drop_duplicates(subset='ds', inplace=True)
 
     ##holiday
-    df_holiday= pd.read_csv("../../feature_data/holidays.csv")
+    blob_holidays = bucket.blob("feature_data/holidays.csv")
+    csv_data_holidays = blob_holidays.download_as_string()
+    df_holiday = pd.read_csv(io.BytesIO(csv_data_holidays))
     df_holiday = df_holiday.reset_index()
     df_holiday.columns = df_holiday.iloc[0]
     # drop the first row, which is now redundant
@@ -115,13 +193,17 @@ def preprocess_complete():
     merged_df = merged_df_h
 
     ##inflation
-    df_inflation_rate= pd.read_csv("../../feature_data/inflation_rate.csv")
+    blob_inflation = bucket.blob("feature_data/inflation_rate.csv")
+    csv_data_inflation = blob_inflation.download_as_string()
+    df_inflation_rate = pd.read_csv(io.BytesIO(csv_data_inflation))
     df_inflation_rate['ds'] = pd.to_datetime(df_inflation_rate['ds'])
     #merge inflation to df
     merged_df= pd.merge(merged_df, df_inflation_rate, how='left', left_on='ds', right_on='ds')
 
     ##consumption climate
-    df_consumption_climate = pd.read_csv("../../feature_data/consumption_climate.csv")
+    blob_consumption_climate = bucket.blob("feature_data/consumption_climate.csv")
+    csv_data_consumption_climate = blob_consumption_climate.download_as_string()
+    df_consumption_climate = pd.read_csv(io.BytesIO(csv_data_consumption_climate))
     df_consumption_climate['ds'] = pd.to_datetime(df_consumption_climate['ds'])
     #merge
     merged_df = pd.merge(merged_df, df_consumption_climate,on="ds",how="left")
@@ -131,7 +213,9 @@ def preprocess_complete():
     merged_df['cov_lock'] = merged_df['cov_lock'].astype(int)
 
     #Berlin Unemployment Mitte and Mitte Mitte
-    df_unemp_ber= pd.read_csv("../../feature_data/berlin_unemployment.csv", sep=";")
+    blob_unemp = bucket.blob("feature_data/berlin_unemployment.csv", sep=";")
+    csv_data_unemp = blob_unemp.download_as_string()
+    df_unemp_ber = pd.read_csv(io.BytesIO(csv_data_unemp))
     # fom object to datetype
     df_unemp_ber['Date'] = pd.to_datetime(df_unemp_ber['Date'])
     df_unemp_ber[['unemp_Berlin_Mitte', 'unemp_Berlin_Mitte_Mitte']] = df_unemp_ber[['unemp_Berlin_Mitte', 'unemp_Berlin_Mitte_Mitte']].apply(lambda x: x.str.replace(',', '.'))
