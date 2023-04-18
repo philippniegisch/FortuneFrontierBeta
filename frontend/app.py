@@ -29,21 +29,12 @@ st.set_option('deprecation.showPyplotGlobalUse', False)
 image_path = os.path.join(root_path, 'frontend', 'images', 'woopwoop.png')
 image = Image.open(image_path)
 
-#csv downloads
-df06_path = os.path.join(root_path, 'output_data/prediction_06.csv')
-df06 = pd.read_csv(df06_path)
-df08_path = os.path.join(root_path, 'output_data/prediction_08.csv')
-df08 = pd.read_csv(df08_path)
-df10_path = os.path.join(root_path, 'output_data/prediction_10.csv')
-df10 = pd.read_csv(df10_path)
-
 columnl, columnm, columnr = st.columns([19,11,12])
 
 #left header column
 columnl.markdown("# :coin: Fortune Frontier :coin:")
 columnl.markdown("### *BETA - Back to the future edition*")
 suggested_dates= datetime.date(2022, 8, 1)
-#, datetime.date(2022, 6, 03), datetime.date(2022, 10, 14)]
 prediction_date = columnl.date_input("Choose a Date to Predict:", suggested_dates, key=None, help=None)
 
 
