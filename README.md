@@ -13,8 +13,7 @@ https://fortunefrontier.streamlit.app/
 
 
 ## team members
-![team](https://user-images.githubusercontent.com/122157879/227543467-e2af80b8-ae40-4cce-8b4a-05e9690da80d.jpg)
-https://github.com/sprisajni  //  https://github.com/philippniegisch  //  https://github.com/ayhamnBokli  //  https://github.com/Tearkistan
+https://github.com/philippniegisch  //  https://github.com/Tearkistan
 
 ## data
 We trained our model on the revenue data of a popular ice cream shop in Berlin that was founded and owned by one of the team members (Philipp) until 2023. 
