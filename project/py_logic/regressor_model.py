@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from prophet import Prophet
 from .preprocess import preprocess_revenue, preprocess_complete
-from frontend.app import prediction_date
 
 def regressor_model():
 
@@ -21,6 +20,9 @@ def regressor_model():
 
     #Setting variables
     horizon = 16
+
+    #to enable input from front end / work around for circular import
+    from frontend.app import prediction_date
 
     #Splitting the data
     split_date = prediction_date
