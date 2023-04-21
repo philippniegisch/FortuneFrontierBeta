@@ -3,6 +3,11 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from prophet import Prophet
 from .preprocess import preprocess_revenue, preprocess_complete
+from google.cloud import storage
+import pandas as pd
+import os
+import io
+
 
 def regressor_model():
 
@@ -13,7 +18,12 @@ def regressor_model():
     #Merge dataframes on ds
     df = pd.merge(df,feature_df,how="left")
     #Loading weather prediction data
-    weather_forecast = pd.read_csv("../feature_data/finall_pred_weather.csv")
+    bucket_name = os.environ.get("BUCKET_NAME")
+    client = storage.Client()
+    bucket = client.get_bucket(bucket_name)
+    blob_pred_weather = bucket.blob("feature_data/finall_pred_weather.csv")
+    csv_data_pred_weather = blob_pred_weather.download_as_string()
+    weather_forecast = pd.read_csv(io.BytesIO(csv_data_pred_weather))
     weather_forecast["ds"] = pd.to_datetime(weather_forecast["ds"])
     weather_forecast["forecast dt iso"] = pd.to_datetime(weather_forecast["forecast dt iso"])
     merged_df = pd.merge(df,feature_df,how="left")
