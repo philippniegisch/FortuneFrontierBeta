@@ -29,3 +29,8 @@ streamlit:
 # ----------------------------------
 install:
 	@pip install . -U
+
+# reinstall package
+reinstall_package:
+	@pip uninstall -y fortune-frontier-beta || :
+	@pip install -e .
