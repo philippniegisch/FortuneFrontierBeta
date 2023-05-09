@@ -13,11 +13,11 @@ root_path = os.path.dirname(os.path.dirname(__file__))
 sys.path.append(root_path)
 from project.py_logic.baseline_model import baseline_model
 from project.py_logic.visualize import nice_plotting
-from project.py_logic.regressor_model import regressor_model
+from project.py_logic.regressor_model_b import regressor_model
 
 #streamlit page configuration
 st.set_page_config(
-    page_title="Fortune Frontier",
+    page_title="Fortune Frontier Beta",
     page_icon=":coin:",
     layout="wide"
 )

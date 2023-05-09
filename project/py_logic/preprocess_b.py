@@ -212,9 +212,9 @@ def preprocess_complete():
     merged_df['cov_lock'] = merged_df['cov_lock'].astype(int)
 
     #Berlin Unemployment Mitte and Mitte Mitte
-    blob_unemp = bucket.blob("feature_data/berlin_unemployment.csv", sep=";")
+    blob_unemp = bucket.blob("feature_data/berlin_unemployment.csv")
     csv_data_unemp = blob_unemp.download_as_string()
-    df_unemp_ber = pd.read_csv(io.BytesIO(csv_data_unemp))
+    df_unemp_ber = pd.read_csv(io.BytesIO(csv_data_unemp), sep=";")
     # fom object to datetype
     df_unemp_ber['Date'] = pd.to_datetime(df_unemp_ber['Date'])
     df_unemp_ber[['unemp_Berlin_Mitte', 'unemp_Berlin_Mitte_Mitte']] = df_unemp_ber[['unemp_Berlin_Mitte', 'unemp_Berlin_Mitte_Mitte']].apply(lambda x: x.str.replace(',', '.'))
