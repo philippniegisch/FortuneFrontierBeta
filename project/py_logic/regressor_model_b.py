@@ -33,7 +33,7 @@ def regressor_model():
     horizon = 16
 
     #to enable input from front end / work around for circular import
-    from frontend.app import prediction_date
+    from frontend.app_b import prediction_date
 
     #Splitting the data
     split_date = prediction_date
