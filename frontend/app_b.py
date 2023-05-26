@@ -1,4 +1,6 @@
 import streamlit as st
+from config import PAGE_CONFIG_SET
+from generate_prediction_date import generate_prediction_date
 import datetime
 import requests
 import pandas as pd
@@ -15,12 +17,14 @@ from project.py_logic.baseline_model import baseline_model
 from project.py_logic.visualize import nice_plotting
 from project.py_logic.regressor_model_b import regressor_model
 
-#streamlit page configuration
-st.set_page_config(
+#streamlit page configuration check
+if not PAGE_CONFIG_SET:
+    # Set the page configuration
+    st.set_page_config(
     page_title="Fortune Frontier Beta",
     page_icon=":coin:",
     layout="wide"
-)
+    )
 
 #remove chart warning
 st.set_option('deprecation.showPyplotGlobalUse', False)
@@ -35,8 +39,9 @@ columnl, columnm, columnr = st.columns([19,11,12])
 columnl.markdown("# :coin: Fortune Frontier :coin:")
 columnl.markdown("### *BETA - Back to the future edition*")
 suggested_dates= datetime.date(2022, 8, 1)
-prediction_date = columnl.date_input("Choose a Date to Predict:", suggested_dates, key=None, help=None)
-
+#prediction_date = columnl.date_input("Choose a Date to Predict:", suggested_dates, key="original", help=None)
+prediction_date = generate_prediction_date()
+prediction_date
 
 #right header column
 columnr.markdown(" ")
@@ -81,7 +86,7 @@ with st.spinner('⏰⬅️🚗💨⚡️ Updating Report...'):
     # Inject CSS with Markdown
     st.markdown(hide_table_row_index, unsafe_allow_html=True)
 
-    nice_plot = nice_plotting(df08)
+    nice_plot = nice_plotting(df)
     nice_plot.update_layout(width=800, height=400)
 
     #Main metrics
