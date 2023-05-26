@@ -21,7 +21,7 @@ install_requirements:
 # ----------------------------------
 
 streamlit:
-	-@streamlit run frontend/app.py
+	-@streamlit run frontend/app_b.py
 
 
 # ----------------------------------
