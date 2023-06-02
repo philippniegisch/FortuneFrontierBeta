@@ -1,6 +1,5 @@
 import streamlit as st
 from config import PAGE_CONFIG_SET
-from generate_prediction_date import generate_prediction_date
 import datetime
 import requests
 import pandas as pd
@@ -39,9 +38,7 @@ columnl, columnm, columnr = st.columns([19,11,12])
 columnl.markdown("# :coin: Fortune Frontier :coin:")
 columnl.markdown("### *BETA - Back to the future edition*")
 suggested_dates= datetime.date(2022, 8, 1)
-#prediction_date = columnl.date_input("Choose a Date to Predict:", suggested_dates, key="original", help=None)
-prediction_date = generate_prediction_date()
-prediction_date
+prediction_date = columnl.date_input("Choose a Date to Predict:", suggested_dates, key="original", help=None)
 
 #right header column
 columnr.markdown(" ")
@@ -57,7 +54,7 @@ st.markdown("---")
 st.write(prediction_date)
 with st.spinner('⏰⬅️🚗💨⚡️ Updating Report...'):
     #df cleaning
-    df = regressor_model()
+    df = regressor_model(prediction_date)
     df = df.rename(columns={'ds': 'Day',
                             'yhat_lower': 'Low Prediction',
                             'yhat': 'Prediction',

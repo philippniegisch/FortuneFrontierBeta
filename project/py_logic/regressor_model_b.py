@@ -9,7 +9,7 @@ import os
 import io
 
 
-def regressor_model():
+def regressor_model(prediction_date):
 
     #Load Data
     df = preprocess_revenue()
@@ -32,10 +32,9 @@ def regressor_model():
     #Setting variables
     horizon = 16
 
-    #to enable input from front end / work around for circular import
-    from frontend.app_b import prediction_date
-
     #Splitting the data
+    print(df)
+    print(merged_df)
     split_date = prediction_date
     index_split = df[df["ds"]==split_date].index[0]
     df_train = merged_df.iloc[:index_split]
