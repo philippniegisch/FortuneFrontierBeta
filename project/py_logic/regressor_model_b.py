@@ -35,7 +35,16 @@ def regressor_model(prediction_date):
 
     #Splitting the data
     split_date = str(prediction_date)
-    index_split = merged_df[merged_df["ds"]==split_date].index[0]
+    #index_split = merged_df[merged_df["ds"]==split_date].index[0]
+
+    indices = merged_df[merged_df["ds"]==split_date].index
+
+    # If the indices list is empty, return a message
+    if len(indices) == 0:
+        return False
+
+    index_split = indices[0]
+
     df_train = merged_df.iloc[:index_split]
     df_test = merged_df.iloc[index_split:]
     y_test = pd.DataFrame(df_test["y"])
