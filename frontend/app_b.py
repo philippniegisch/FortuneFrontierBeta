@@ -52,6 +52,7 @@ st.markdown("### Your Predicted Fortune: :crystal_ball:")
 st.markdown("---")
 
 st.write(prediction_date)
+st.write(f"{type(prediction_date)}")
 with st.spinner('⏰⬅️🚗💨⚡️ Updating Report...'):
     #df cleaning
     df = regressor_model(prediction_date)
