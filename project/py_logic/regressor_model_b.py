@@ -16,14 +16,15 @@ def regressor_model(prediction_date):
     #Load feature dataframe
     feature_df = preprocess_complete()
     #Merge dataframes on ds
-    df = pd.merge(df,feature_df,how="left")
+    #df = pd.merge(df,feature_df,how="left")
     #Loading weather prediction data
-    bucket_name = os.environ.get("BUCKET_NAME")
-    client = storage.Client()
-    bucket = client.get_bucket(bucket_name)
-    blob_pred_weather = bucket.blob("feature_data/finall_pred_weather.csv")
-    csv_data_pred_weather = blob_pred_weather.download_as_string()
-    weather_forecast = pd.read_csv(io.BytesIO(csv_data_pred_weather))
+        #bucket_name = os.environ.get("BUCKET_NAME")
+        #client = storage.Client()
+        #bucket = client.get_bucket(bucket_name)
+        #blob_pred_weather = bucket.blob("feature_data/finall_pred_weather.csv")
+        #csv_data_pred_weather = blob_pred_weather.download_as_string()
+        #weather_forecast = pd.read_csv(io.BytesIO(csv_data_pred_weather))
+    weather_forecast = pd.read_csv("feature_data/finall_pred_weather.csv")
     weather_forecast["ds"] = pd.to_datetime(weather_forecast["ds"])
     weather_forecast["forecast dt iso"] = pd.to_datetime(weather_forecast["forecast dt iso"])
     merged_df = pd.merge(df,feature_df,how="left")
@@ -33,10 +34,8 @@ def regressor_model(prediction_date):
     horizon = 16
 
     #Splitting the data
-    print(df)
-    print(merged_df)
-    split_date = prediction_date
-    index_split = df[df["ds"]==split_date].index[0]
+    split_date = str(prediction_date)
+    index_split = merged_df[merged_df["ds"]==split_date].index[0]
     df_train = merged_df.iloc[:index_split]
     df_test = merged_df.iloc[index_split:]
     y_test = pd.DataFrame(df_test["y"])
