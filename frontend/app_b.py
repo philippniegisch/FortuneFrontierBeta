@@ -13,7 +13,7 @@ from PIL import Image
 root_path = os.path.dirname(os.path.dirname(__file__))
 sys.path.append(root_path)
 from project.py_logic.baseline_model import baseline_model
-from project.py_logic.visualize import nice_plotting
+from project.py_logic.visualize_b import nice_plotting
 from project.py_logic.regressor_model_b import regressor_model
 
 #streamlit page configuration check
@@ -52,11 +52,11 @@ st.markdown("### Your Predicted Fortune: :crystal_ball:")
 st.markdown("---")
 
 st.write(prediction_date)
-st.write(f"{type(prediction_date)}")
 with st.spinner('⏰⬅️🚗💨⚡️ Updating Report...'):
     #df cleaning
     df = regressor_model(prediction_date)
-    df = df.rename(columns={'ds': 'Day',
+
+    table_df = df.rename(columns={'ds': 'Day',
                             'yhat_lower': 'Low Prediction',
                             'yhat': 'Prediction',
                             'yhat_upper': 'High Prediction',
@@ -64,8 +64,8 @@ with st.spinner('⏰⬅️🚗💨⚡️ Updating Report...'):
                             'error': 'Error',
                             'mae%': 'Error %'})
     #df['Day'] = df['Day'].dt.date
-    df_mini = df[["Day", "Prediction", "Error %"]].iloc[1:]
-    styled_df = df.style.format({'Low Prediction': "{:.2f}",
+    df_mini = table_df[["Day", "Prediction", "Error %"]].iloc[1:]
+    styled_df = table_df.style.format({'Low Prediction': "{:.2f}",
                                     'Prediction': "{:.2f}",
                                     'High Prediction': "{:.2f}",
                                     'True Value': "{:.2f}",
@@ -91,9 +91,9 @@ with st.spinner('⏰⬅️🚗💨⚡️ Updating Report...'):
     m1, m2, m3, m4, m5 = st.columns((1,1,1,1,1))
 
     m1.write('')
-    m2.metric(label ="Today's Prediction",value = str(int(df["Prediction"].iloc[0]))+"€")
-    m3.metric(label ="Today's Error %" ,value = str(int(df['Error %'].iloc[0]))+"%")
-    m4.metric(label = 'Historic True Value',value = str(int(df['True Value'].iloc[0]))+"€")
+    m2.metric(label ="Today's Prediction",value = str(int(table_df["Prediction"].iloc[0]))+"€")
+    m3.metric(label ="Today's Error %" ,value = str(int(table_df['Error %'].iloc[0]))+"%")
+    m4.metric(label = 'Historic True Value',value = str(int(table_df['True Value'].iloc[0]))+"€")
     m5.write('')
 
     #Main table and chart
