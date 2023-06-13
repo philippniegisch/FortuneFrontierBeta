@@ -56,58 +56,65 @@ with st.spinner('⏰⬅️🚗💨⚡️ Updating Report...'):
     #df cleaning
     df = regressor_model(prediction_date)
 
-    table_df = df.rename(columns={'ds': 'Day',
-                            'yhat_lower': 'Low Prediction',
-                            'yhat': 'Prediction',
-                            'yhat_upper': 'High Prediction',
-                            'y_true': 'True Value',
-                            'error': 'Error',
-                            'mae%': 'Error %'})
-    #df['Day'] = df['Day'].dt.date
-    df_mini = table_df[["Day", "Prediction", "Error %"]].iloc[1:]
-    styled_df = table_df.style.format({'Low Prediction': "{:.2f}",
-                                    'Prediction': "{:.2f}",
-                                    'High Prediction': "{:.2f}",
-                                    'True Value': "{:.2f}",
-                                    'Error': "{:.2f}",
-                                    'Error %': "{:.2f}"})
-    stlyed_df_mini = df_mini.style.format({ 'Prediction': "{:.2f}",
-                                    'Error %': "{:.2f}"})
+    #check if string or df
+    if isinstance(df, pd.DataFrame) == True:
 
-    # CSS to inject contained in a stringS
-    hide_table_row_index = """
-                <style>
-                thead tr th:first-child {display:none}
-                tbody th {display:none}
-                </style>
-                """
-    # Inject CSS with Markdown
-    st.markdown(hide_table_row_index, unsafe_allow_html=True)
+        #if dataframe
+        table_df = df.rename(columns={'ds': 'Day',
+                                'yhat_lower': 'Low Prediction',
+                                'yhat': 'Prediction',
+                                'yhat_upper': 'High Prediction',
+                                'y_true': 'True Value',
+                                'error': 'Error',
+                                'mae%': 'Error %'})
+        #df['Day'] = df['Day'].dt.date
+        df_mini = table_df[["Day", "Prediction", "Error %"]].iloc[1:]
+        styled_df = table_df.style.format({'Low Prediction': "{:.2f}",
+                                        'Prediction': "{:.2f}",
+                                        'High Prediction': "{:.2f}",
+                                        'True Value': "{:.2f}",
+                                        'Error': "{:.2f}",
+                                        'Error %': "{:.2f}"})
+        stlyed_df_mini = df_mini.style.format({ 'Prediction': "{:.2f}",
+                                        'Error %': "{:.2f}"})
 
-    nice_plot = nice_plotting(df)
-    nice_plot.update_layout(width=800, height=400)
+        # CSS to inject contained in a stringS
+        hide_table_row_index = """
+                    <style>
+                    thead tr th:first-child {display:none}
+                    tbody th {display:none}
+                    </style>
+                    """
+        # Inject CSS with Markdown
+        st.markdown(hide_table_row_index, unsafe_allow_html=True)
 
-    #Main metrics
-    m1, m2, m3, m4, m5 = st.columns((1,1,1,1,1))
+        nice_plot = nice_plotting(df)
+        nice_plot.update_layout(width=800, height=400)
 
-    m1.write('')
-    m2.metric(label ="Today's Prediction",value = str(int(table_df["Prediction"].iloc[0]))+"€")
-    m3.metric(label ="Today's Error %" ,value = str(int(table_df['Error %'].iloc[0]))+"%")
-    m4.metric(label = 'Historic True Value',value = str(int(table_df['True Value'].iloc[0]))+"€")
-    m5.write('')
+        #Main metrics
+        m1, m2, m3, m4, m5 = st.columns((1,1,1,1,1))
 
-    #Main table and chart
-    column1, column2 = st.columns([1, 2])
+        m1.write('')
+        m2.metric(label ="Today's Prediction",value = str(int(table_df["Prediction"].iloc[0]))+"€")
+        m3.metric(label ="Today's Error %" ,value = str(int(table_df['Error %'].iloc[0]))+"%")
+        m4.metric(label = 'Historic True Value',value = str(int(table_df['True Value'].iloc[0]))+"€")
+        m5.write('')
 
-    #Main table
-    column1.markdown("#### Forecasted Revenues:")
-    column1.table(stlyed_df_mini)
+        #Main table and chart
+        column1, column2 = st.columns([1, 2])
 
-    column2.markdown("#### Forecast Performance:")
-    column2.plotly_chart(nice_plot,use_container_width=True, use_container_height=True)
+        #Main table
+        column1.markdown("#### Forecasted Revenues:")
+        column1.table(stlyed_df_mini)
 
-    #Full table
-    '''
-    #### Full Forecast View:
-    '''
-    st.table(styled_df)
+        column2.markdown("#### Forecast Performance:")
+        column2.plotly_chart(nice_plot,use_container_width=True, use_container_height=True)
+
+        #Full table
+        '''
+        #### Full Forecast View:
+        '''
+        st.table(styled_df)
+    else:
+        st.markdown("# Sorry Fortune Frontier Fandom :heart:, but the store was closed on day selected, try again! :sparkles:")
+        st.markdown("### Hint :jigsaw:: try months outside of winter and before the store closed in November 2022")
