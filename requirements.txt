@@ -6,6 +6,7 @@ seaborn
 requests
 google-cloud-bigquery
 google-cloud-storage
+db-dtypes
 plotly
 prophet
 

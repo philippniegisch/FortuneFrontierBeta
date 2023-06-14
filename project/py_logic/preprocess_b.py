@@ -1,21 +1,36 @@
 #IMPORTS
 import pandas as pd
 import numpy as np
-from google.cloud import storage
+from google.cloud import storage, bigquery
 import pandas as pd
 import os
 import io
 
 def preprocess_revenue():
+    #import raa revenue data with BQ
+    # Initialize a BigQuery client
+    client = bigquery.Client()
+    gcp_project = os.environ['GCP_PROJECT']
+    bq_dataset = os.environ['BQ_DATASET']
+
+    # 2016 SQL query
+    sql2016 = f"""
+    SELECT * FROM `{gcp_project}.{bq_dataset}.orders2016`
+    """
+
+    # Create df
+    df_2016 = client.query(sql2016).to_dataframe()
+
+
     #call GCS bucket
     bucket_name = os.environ.get("BUCKET_NAME")
     client = storage.Client()
     bucket = client.get_bucket(bucket_name)
 
-    #import raw revenue data
-    blob2016 = bucket.blob("orders2016.csv")
-    csv_data2016 = blob2016.download_as_string()
-    df_2016 = pd.read_csv(io.BytesIO(csv_data2016), sep=";")
+    #import raw revenue data with GCS
+    #blob2016 = bucket.blob("orders2016.csv")
+    #csv_data2016 = blob2016.download_as_string()
+    #df_2016 = pd.read_csv(io.BytesIO(csv_data2016), sep=";")
 
     blob2017 = bucket.blob("orders2017.csv")
     csv_data2017 = blob2017.download_as_string()
