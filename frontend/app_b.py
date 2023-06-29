@@ -36,9 +36,11 @@ columnl, columnm, columnr = st.columns([19,11,12])
 
 #left header column
 columnl.markdown("# :coin: Fortune Frontier :coin:")
-columnl.markdown("### *BETA - Back to the future edition*")
+columnl.markdown("##### *BETA - Back to the future edition*")
 suggested_dates= datetime.date(2022, 8, 1)
 prediction_date = columnl.date_input("Choose a Date to Predict:", suggested_dates, key="original", help=None)
+columnl.markdown("### Your 16-day Revenue Forecast: :crystal_ball:")
+#columnl.markdown("###### *Leveraging Machine Learning and Historical Data to predict your Future Fortune*")
 
 #right header column
 columnr.markdown(" ")
@@ -48,7 +50,8 @@ columnr.image(image, caption= "First Use Case: Woop Woop Ice Cream Berlin", widt
 
 
 #prediction
-st.markdown("### Your Predicted Fortune: :crystal_ball:")
+#st.markdown("### Your 16-day Revenue Forecast: :crystal_ball:")
+st.markdown("###### *Leveraging Machine Learning and Historical Data to predict your Future Fortune*")
 st.markdown("---")
 
 st.write(prediction_date)
@@ -95,9 +98,9 @@ with st.spinner('⏰⬅️🚗💨⚡️ Updating Report...'):
         m1, m2, m3, m4, m5 = st.columns((1,1,1,1,1))
 
         m1.write('')
-        m2.metric(label ="Today's Prediction",value = str(int(table_df["Prediction"].iloc[0]))+"€")
-        m3.metric(label ="Today's Error %" ,value = str(int(table_df['Error %'].iloc[0]))+"%")
-        m4.metric(label = 'Historic True Value',value = str(int(table_df['True Value'].iloc[0]))+"€")
+        m2.metric(label ="Today's Revenue Prediction",value = str(int(table_df["Prediction"].iloc[0]))+"€")
+        m3.metric(label ="Today's Revenue Error %" ,value = str(int(table_df['Error %'].iloc[0]))+"%")
+        m4.metric(label = 'Historic True Revenue',value = str(int(table_df['True Value'].iloc[0]))+"€")
         m5.write('')
 
         #Main table and chart

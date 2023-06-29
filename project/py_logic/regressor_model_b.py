@@ -89,6 +89,6 @@ def regressor_model(prediction_date):
     prediction_forecast = seven_day_forecast_slim
     prediction_forecast["y_true"] = y_test.head(horizon)
     prediction_forecast["error"]=abs(prediction_forecast["yhat"]-prediction_forecast["y_true"])
-    prediction_forecast["mae%"]=prediction_forecast["error"] / prediction_forecast["y_true"]
+    prediction_forecast["mae%"]=prediction_forecast["error"] / prediction_forecast["y_true"] * 100
 
     return prediction_forecast
