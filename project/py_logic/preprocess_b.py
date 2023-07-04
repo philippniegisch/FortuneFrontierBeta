@@ -182,4 +182,12 @@ def preprocess_complete():
     merged_df.drop(['visibility', 'dew_point', 'feels_like', 'temp_min', 'temp_max', 'pressure', 'wind_gust',
             'snow_1h', 'weather_id', 'weather_main', 'weather_description', 'unemp_Berlin_Mitte_Mitte'], axis=1, inplace=True)
 
+    #Correcting GCP capitalization of dtypes - int
+    for col in merged_df.columns:
+        if pd.api.types.is_integer_dtype(merged_df[col]):
+            merged_df[col] = merged_df[col].astype('int64')
+
+    #Correcting GCP capitalization of dtypes - float
+    merged_df["y"]=merged_df["y"].astype("float64")
+
     return merged_df
