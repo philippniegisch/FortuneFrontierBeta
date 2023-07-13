@@ -1,10 +1,12 @@
 import pandas as pd
 import numpy as np
+import streamlit as st
 from google.cloud import bigquery
 import pandas as pd
 import os
 import io
 
+@st.cache_data #ensure loading of data only once for quicker load after first
 def preprocess_revenue():
     #import revenue data with BQ
     # Initialize a BigQuery client
@@ -58,6 +60,7 @@ def preprocess_revenue():
 
     return df
 
+@st.cache_data #ensure loading of data only once for quicker load after first
 def preprocess_complete():
     #import revenue data with BQ
     # Initialize a BigQuery client

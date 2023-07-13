@@ -3,11 +3,10 @@ from datetime import datetime, timedelta
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.offline import plot
-import dash
-#from dash.dcc import dcc
-#from dash.html import html
+from plotly.io import to_html
+from dash import Dash, dcc, html
 import streamlit as st
-from streamlit import components
+import streamlit.components.v1 as components
 import sys
 import os
 
@@ -30,7 +29,7 @@ df_yearly.columns = ['year', 'sum_y']
 st.title("Streamlit Dash Integration")
 
 # Create a Dash app
-dash_app = dash.Dash(__name__)
+dash_app = Dash(__name__)
 
 def bar_chart():
 
@@ -46,22 +45,22 @@ def scatter_plot():
     fig.add_trace(go.Scatter(x=df['ds'],y=df['y'], mode='markers'))
     return fig
 
-dash_app.layout = dash.html.Div(
+dash_app.layout = html.Div(
     id='parent',
     children=[
-        dash.html.H1(
+        html.H1(
             id='h1',
             children='Data Analytics Dashboard',
             style={'textAlign': 'center', 'marginTop': 25, 'marginBottom': 25}
         ),
-        dash.html.Div(
+        html.Div(
             id='bar_div',
-            children=[dash.dcc.Graph(id='bar_plot', figure=bar_chart())],
+            children=[dcc.Graph(id='bar_plot', figure=bar_chart())],
             style={'width': '50%', 'display': 'inline-block'}
         ),
-        dash.html.Div(
+        html.Div(
             id='scatter_div',
-            children=[dash.dcc.Graph(id='scatter_plot', figure=scatter_plot())],
+            children=[dcc.Graph(id='scatter_plot', figure=scatter_plot())],
             style={'width': '50%', 'display': 'inline-block'}
         ),
     ]
@@ -71,4 +70,4 @@ dash_app.layout = dash.html.Div(
 dash_app_html = dash_app.to_html()
 
 # Render the Dash app within Streamlit
-components.dash.html(dash_app_html, height=500)
+components.html(dash_app_html, height=500)
