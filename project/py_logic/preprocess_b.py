@@ -4,7 +4,9 @@ from google.cloud import bigquery
 import pandas as pd
 import os
 import io
+import streamlit as st
 
+@st.cache
 def preprocess_revenue():
     #import revenue data with BQ
     # Initialize a BigQuery client
@@ -58,6 +60,7 @@ def preprocess_revenue():
 
     return df
 
+@st.cache
 def preprocess_complete():
     #import revenue data with BQ
     # Initialize a BigQuery client
