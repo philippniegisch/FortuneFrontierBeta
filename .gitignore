@@ -7,3 +7,4 @@ api/
 .env
 project/params.py
 *.egg-info
+fortune_frontier_beta_v*
