@@ -5,19 +5,12 @@ import pandas as pd
 import os
 import io
 import streamlit as st
-from google.oauth2 import service_account
 
-# Calling Google API client
-credentials = service_account.Credentials.from_service_account_info(
-    st.secrets["gcp_service_account"]
-)
-client = bigquery.Client(credentials=credentials)
-
-@st.cache_data
+@st.cache
 def preprocess_revenue():
     #import revenue data with BQ
     # Initialize a BigQuery client
-    #client = bigquery.Client()
+    client = bigquery.Client()
     gcp_project = os.environ['GCP_PROJECT']
     bq_dataset = os.environ['BQ_DATASET']
 
@@ -67,11 +60,11 @@ def preprocess_revenue():
 
     return df
 
-@st.cache_data
+@st.cache
 def preprocess_complete():
     #import revenue data with BQ
     # Initialize a BigQuery client
-    #client = bigquery.Client()
+    client = bigquery.Client()
     gcp_project = os.environ['GCP_PROJECT']
     bq_dataset = os.environ['BQ_DATASET']
 
