@@ -2,7 +2,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from prophet import Prophet
-from .preprocess_b import preprocess_complete
+from .preprocess_b import preprocess_revenue, preprocess_complete
+from google.cloud import storage
 import pandas as pd
 import os
 import io
@@ -10,15 +11,24 @@ import io
 
 def regressor_model(prediction_date):
 
+    #Load Data
+    df = preprocess_revenue()
     #Load feature dataframe
     feature_df = preprocess_complete()
     #Merge dataframes on ds
     #df = pd.merge(df,feature_df,how="left")
     #Loading weather prediction data
+        #bucket_name = os.environ.get("BUCKET_NAME")
+        #client = storage.Client()
+        #bucket = client.get_bucket(bucket_name)
+        #blob_pred_weather = bucket.blob("feature_data/finall_pred_weather.csv")
+        #csv_data_pred_weather = blob_pred_weather.download_as_string()
+        #weather_forecast = pd.read_csv(io.BytesIO(csv_data_pred_weather))
     weather_forecast = pd.read_csv("feature_data/finall_pred_weather.csv")
     weather_forecast["ds"] = pd.to_datetime(weather_forecast["ds"])
     weather_forecast["forecast dt iso"] = pd.to_datetime(weather_forecast["forecast dt iso"])
-    feature_df['cap'] = 1.2 * feature_df['y'].max()
+    merged_df = pd.merge(df,feature_df,how="left")
+    merged_df['cap'] = 1.2 * df['y'].max()
 
     #Setting variables
     horizon = 16
@@ -27,7 +37,7 @@ def regressor_model(prediction_date):
     split_date = str(prediction_date)
     #index_split = merged_df[merged_df["ds"]==split_date].index[0]
 
-    indices = feature_df[feature_df["ds"]==split_date].index
+    indices = merged_df[merged_df["ds"]==split_date].index
 
     # If the indices list is empty, return a message
     if len(indices) == 0:
@@ -35,8 +45,8 @@ def regressor_model(prediction_date):
 
     index_split = indices[0]
 
-    df_train = feature_df.iloc[:index_split]
-    df_test = feature_df.iloc[index_split:]
+    df_train = merged_df.iloc[:index_split]
+    df_test = merged_df.iloc[index_split:]
     y_test = pd.DataFrame(df_test["y"])
     weather_index_split = weather_forecast[weather_forecast["forecast dt iso"]==split_date].index[0]
     weather_predict = weather_forecast.iloc[weather_index_split:weather_index_split+horizon,:]
@@ -59,7 +69,7 @@ def regressor_model(prediction_date):
 
     #Creating future dataframe
     future = m.make_future_dataframe(periods=horizon)
-    future['cap'] = 1.2 * feature_df['y'].max()
+    future['cap'] = 1.2 * merged_df['y'].max()
 
     #Adding feature values to future dataframe
     future = pd.merge(future,feature_df,how="left")

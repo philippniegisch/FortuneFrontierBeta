@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from prophet import Prophet
-from .preprocess import preprocess_revenue
+from .preprocess_b import preprocess_revenue
 
 def baseline_model():
 
