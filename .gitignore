@@ -8,7 +8,7 @@ api/
 project/params.py
 *.egg-info
 fortune_frontier_beta_v*
-secrets.toml
+*secrets.toml
 __pycache__/
 *.pyc
 .python-version

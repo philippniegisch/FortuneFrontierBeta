@@ -1,15 +1,28 @@
 import pandas as pd
 import numpy as np
+from google.cloud import bigquery
 import pandas as pd
 import os
 import io
 import streamlit as st
 
-@st.cache_data
-def preprocess_complete():
-    #df data
-    #import raw revenue data
-    df_2016 = pd.read_csv("raw_data/orders2016.csv", sep=";")
+@st.cache
+def preprocess_revenue():
+    #import revenue data with BQ
+    # Initialize a BigQuery client
+    client = bigquery.Client()
+    gcp_project = os.environ['GCP_PROJECT']
+    bq_dataset = os.environ['BQ_DATASET']
+
+    # full orders BQ query and df
+    query = f"""
+    SELECT * FROM `{gcp_project}.{bq_dataset}.orders_full`
+    """
+    df = client.query(query).to_dataframe()
+
+    '''
+    #previous structure
+
     df_2017 = pd.read_csv("raw_data/orders2017.csv", sep=";")
     df_2018 = pd.read_csv("raw_data/orders2018.csv", sep=";")
     df_2019 = pd.read_csv("raw_data/orders2019.csv", sep=";")
@@ -17,13 +30,52 @@ def preprocess_complete():
     df_2021 = pd.read_csv("raw_data/orders2021.csv", sep=";")
     df_2022 = pd.read_csv("raw_data/orders2022.csv", sep=";")
 
+
     df_list = [df_2016, df_2017, df_2018, df_2019, df_2020, df_2021, df_2022]
 
     #Dropping unnecessary columns, grouping by "date", summing "item_price" to get daily revenues
+
     for i, df in enumerate(df_list):
         df_list[i] = pd.DataFrame(df.groupby(by="date")["item_price"].sum()/100)
+
     #Concat all data in one dataframe, rename the columns for prophet
+
     df = pd.concat(df_list, ignore_index=False)
+    '''
+    #Dropping unnecessary columns, grouping by "date", summing "item_price" to get daily revenues
+    df = pd.DataFrame(df.groupby(by="date")["item_price"].sum()/100)
+    df = df.rename(columns={"date": "ds", "item_price": "y"})
+    df["ds"] = df.index
+    df = df.reset_index(drop=True)
+    df = df[["ds","y"]]
+
+    #turning the ds (date) column into datetime
+
+    df['ds']=pd.to_datetime(df['ds'])
+
+    #Dropping outliers
+    df = df[df["y"]>=60]
+    df = df[df["y"]<=2300]
+    df = df.reset_index(drop=True)
+
+    return df
+
+@st.cache
+def preprocess_complete():
+    #import revenue data with BQ
+    # Initialize a BigQuery client
+    client = bigquery.Client()
+    gcp_project = os.environ['GCP_PROJECT']
+    bq_dataset = os.environ['BQ_DATASET']
+
+    # full orders BQ query and df
+    query = f"""
+    SELECT * FROM `{gcp_project}.{bq_dataset}.orders_full`
+    """
+    df = client.query(query).to_dataframe()
+
+    #Dropping unnecessary columns, grouping by "date", summing "item_price" to get daily revenues
+    df = pd.DataFrame(df.groupby(by="date")["item_price"].sum()/100)
     df = df.rename(columns={"date": "ds", "item_price": "y"})
     df["ds"] = df.index
     df = df.reset_index(drop=True)
@@ -35,8 +87,14 @@ def preprocess_complete():
     df = df[df["y"]<=2300]
     df = df.reset_index(drop=True)
 
-    #weather data csv
-    weather_df = pd.read_csv("feature_data/weather.csv")
+    #remove the duplicates
+    #DELETE duplicates = df['ds'].duplicated()
+
+    # weather BQ query and df
+    query = f"""
+    SELECT * FROM `{gcp_project}.{bq_dataset}.weather`
+    """
+    weather_df = client.query(query).to_dataframe()
 
     #drop some columns
     weather_df = weather_df.drop(columns=["dt","timezone","city_name","lat","lon","sea_level","grnd_level","weather_icon","rain_3h","snow_3h"])
@@ -70,12 +128,14 @@ def preprocess_complete():
     merged_df.drop_duplicates(subset='ds', inplace=True)
 
     # holidays BQ query and df
-    df_holiday= pd.read_csv("feature_data/holidays.csv")
-
-    df_holiday = df_holiday.reset_index()
-    df_holiday.columns = df_holiday.iloc[0]
+    query = f"""
+    SELECT * FROM `{gcp_project}.{bq_dataset}.holidays`
+    """
+    df_holiday = client.query(query).to_dataframe()
+    #df_holiday = df_holiday.reset_index()
+    #df_holiday.columns = df_holiday.iloc[0]
     # drop the first row, which is now redundant
-    df_holiday = df_holiday.drop(0)
+    # df_holiday = df_holiday.drop(0)
     df_holiday['ds'] = pd.to_datetime(df_holiday['ds'])
     df_holiday.info()
     #merge holiday to df
@@ -83,13 +143,19 @@ def preprocess_complete():
     #DELETE merged_df = merged_df_h
 
     # inflation BQ query and df
-    df_inflation_rate = pd.read_csv("feature_data/inflation_rate.csv")
+    query = f"""
+    SELECT * FROM `{gcp_project}.{bq_dataset}.inflation`
+    """
+    df_inflation_rate = client.query(query).to_dataframe()
     df_inflation_rate['ds'] = pd.to_datetime(df_inflation_rate['ds'])
     #merge inflation to df
     merged_df= pd.merge(merged_df, df_inflation_rate, how='left', left_on='ds', right_on='ds')
 
     # consumption climate query and df
-    df_consumption_climate = pd.read_csv("feature_data/consumption_climate.csv")
+    query = f"""
+    SELECT * FROM `{gcp_project}.{bq_dataset}.consumption_climate`
+    """
+    df_consumption_climate = client.query(query).to_dataframe()
     df_consumption_climate['ds'] = pd.to_datetime(df_consumption_climate['ds'])
     #merge
     merged_df = pd.merge(merged_df, df_consumption_climate,on="ds",how="left")
@@ -99,11 +165,14 @@ def preprocess_complete():
     merged_df['cov_lock'] = merged_df['cov_lock'].astype(int)
 
     # Berlin Unemployment Mitte and Mitte Mitte query and df
-    df_unemp_ber= pd.read_csv("feature_data/berlin_unemployment.csv", sep=";")
+    query = f"""
+    SELECT * FROM `{gcp_project}.{bq_dataset}.berlin_unemployment`
+    """
+    df_unemp_ber = client.query(query).to_dataframe()
     # fom object to datetype
     df_unemp_ber['Date'] = pd.to_datetime(df_unemp_ber['Date'])
-    df_unemp_ber[['unemp_Berlin_Mitte', 'unemp_Berlin_Mitte_Mitte']] = df_unemp_ber[['unemp_Berlin_Mitte', 'unemp_Berlin_Mitte_Mitte']].apply(lambda x: x.str.replace(',', '.'))
-    df_unemp_ber = df_unemp_ber.astype({"unemp_Berlin_Mitte": float, "unemp_Berlin_Mitte_Mitte": float})
+    #df_unemp_ber[['unemp_Berlin_Mitte', 'unemp_Berlin_Mitte_Mitte']] = df_unemp_ber[['unemp_Berlin_Mitte', 'unemp_Berlin_Mitte_Mitte']].apply(lambda x: x.str.replace(',', '.'))
+    #df_unemp_ber = df_unemp_ber.astype({"unemp_Berlin_Mitte": float, "unemp_Berlin_Mitte_Mitte": float})
     df_unemp_ber[['unemp_Berlin_Mitte', 'unemp_Berlin_Mitte_Mitte']] = df_unemp_ber[['unemp_Berlin_Mitte', 'unemp_Berlin_Mitte_Mitte']].div(100)
     df_unemp_ber.set_index('Date', inplace=True)
     df_unemp_ber = df_unemp_ber.resample('D').ffill()

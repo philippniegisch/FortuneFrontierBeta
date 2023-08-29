@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from prophet import Prophet
-from .preprocess_b import preprocess_revenue
+from .preprocess_b import preprocess_complete
 
 def baseline_model():
 
@@ -10,7 +10,7 @@ def baseline_model():
     model = Prophet()
 
     #Load Data
-    df = preprocess_revenue()
+    df = preprocess_complete()
 
     #Prediction Date
     split_date = "2022-07-31"
