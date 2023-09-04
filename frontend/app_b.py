@@ -209,6 +209,8 @@ with tab3:
         #Dataset is loaded as df
         df = preprocess_revenue()
 
+        df.rename(columns={'y': 'Revenue'}, inplace=True)
+
         # Expanding dates for complete dates
         min_date = pd.to_datetime("2016-01-01")
         max_date = pd.to_datetime("2022-12-31")
@@ -219,7 +221,7 @@ with tab3:
         df = df.reset_index(drop=True)
 
         #Fill missing values with zeros
-        df['y'] = df['y'].fillna(0)
+        df['Revenue'] = df['Revenue'].fillna(0)
 
         #Creating seasonal columns
         df['Year'] = df['ds'].dt.year
@@ -229,16 +231,16 @@ with tab3:
         df['Weekday'] = df['ds'].dt.strftime('%A')
 
         # Compute total revenue and fill missing values with zeros
-        total_revenue = df['y'].sum()
+        total_revenue = df['Revenue'].sum()
 
         # Prepare the data
-        df_hierarchy = df.groupby(['Year', 'Season', 'Month', 'Week', 'Weekday'], as_index=False)['y'].sum()
+        df_hierarchy = df.groupby(['Year', 'Season', 'Month', 'Week', 'Weekday'], as_index=False)['Revenue'].sum()
 
         # Filter out rows with zero revenue
-        df_hierarchy = df_hierarchy[df_hierarchy['y'] != 0]
+        df_hierarchy = df_hierarchy[df_hierarchy['Revenue'] != 0]
 
         # Create the Sunburst chart
-        fig = px.sunburst(df_hierarchy, path=['Year', 'Season', 'Month', 'Week', 'Weekday'], values='y', color='y')
+        fig = px.sunburst(df_hierarchy, path=['Year', 'Season', 'Month', 'Week', 'Weekday'], values='Revenue', color='Revenue')
         fig.update_traces(sort=False, customdata=df_hierarchy[['Year','Season', 'Month', 'Week']], selector=dict(type='sunburst'))
         st.plotly_chart(fig)
 
