@@ -6,7 +6,7 @@ import io
 import streamlit as st
 
 @st.cache_data
-def preprocess_complete():
+def preprocess_revenue():
     #df data
     #import raw revenue data
     df_2016 = pd.read_csv("raw_data/orders2016.csv", sep=";")
@@ -30,6 +30,12 @@ def preprocess_complete():
     df = df[["ds","y"]]
     #turning the ds (date) column into datetim
     df['ds']=pd.to_datetime(df['ds'])
+
+    return df
+
+@st.cache_data
+def preprocess_complete():
+    df = preprocess_revenue()
     #Dropping outliers
     df = df[df["y"]>=60]
     df = df[df["y"]<=2300]
