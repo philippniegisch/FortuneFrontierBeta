@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from .regressor_model_b import regressor_model
+from .regressor_model_hourly import regressor_model
 import plotly.express as px
 import pandas as pd
 import plotly.graph_objs as go
@@ -117,7 +117,7 @@ def plotting():
 
     # Add a legend and axis labels
     ax.legend()
-    ax.set_xlabel('Date')
+    ax.set_xlabel('Time')
     ax.set_ylabel('Revenue')
 
     # Show the plot
